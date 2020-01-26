@@ -235,10 +235,10 @@ void calculate_derivative(void){
 }
 
 void set_motors(void){
+  set_motor_y(map(controller.xp + controller.xi + controller.xd, -3000 - params.xGoal, 3000 - params.xGoal, min_thrust, max_thrust));
+  set_motor_y(map(-controller.xp - controller.xi - controller.xd, -3000 - params.xGoal, 3000 - params.xGoal, min_thrust, max_thrust));
   set_motor_y(map(controller.yp + controller.yi + controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, min_thrust, max_thrust));
-//  set_motor_inv_x(trim((px2 * p_gain) + (ix2 * i_gain) + throttle, min_thrust, max_thrust));
-//  set_motor_y(trim((py1 * p_gain) + (iy1 * i_gain) + (dy1_new_avg - dy1_old_avg) + throttle, min_thrust, max_thrust));
-//  set_motor_inv_y(trim((py2 * p_gain) + (iy2 * i_gain) + throttle, min_thrust, max_thrust));
+  set_motor_y(map(-controller.yp - controller.yi - controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, min_thrust, max_thrust));
 }
 
 void set_accel_data(LIS3DSH_DataScaled accelData){
@@ -276,9 +276,6 @@ void config_control_params(void){
   params.pGain = 2;
   params.iGain = .02;
   params.dGain = 7;
-//  params.pGain = 2;
-//  params.iGain = .02;
-//  params.dGain = 30;
 
   integralData.x = 0;
   integralData.y = 0;
