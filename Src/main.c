@@ -1,8 +1,7 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body
+  * @brief          : Main control loop
   ******************************************************************************
   * @attention
   *
@@ -16,90 +15,30 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "MY_LIS3DSH.h"
-#include "string.h"
 #include <stdio.h>
+#include "main.h"
+#include "utils.h"
+#include "drone.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
 LIS3DSH_DataScaled accelData;
 UART_HandleTypeDef huart2;
 int EXTI0_FLAG = 0;
-int min_thrust = 183; //180
-int max_thrust = 366; //370
-int min_accel = -1000;
-int max_accel = 1000;
-/* USER CODE END PD */
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim4;
 
-/* USER CODE BEGIN PV */
-void EXTI0_IRQHandler(void)
-{
-  HAL_NVIC_ClearPendingIRQ(EXTI0_IRQn);
-  EXTI0_FLAG = 1;
-}
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void UART_Config(void);
-void calibrate_accel(void);
 void init_motors(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM4_Init(void);
-int16_t map(int16_t, int16_t, int16_t, int16_t, int16_t);
-int16_t trim(int16_t, int16_t, int16_t);
-void set_motor_x(uint32_t);
-void set_motor_inv_x(uint32_t);
-void set_motor_y(uint32_t);
-void set_motor_inv_y(uint32_t);
-//float shift(float*, int);
-//float average(float*, int);
 void config_accel(void);
 void config_control_params(void);
-void set_accel_data(LIS3DSH_DataScaled);
-void calculate_proportion(void);
-void calculate_integral(void);
-void calculate_derivative(void);
-void set_motors(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 int16_t txData[4];
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 
 LIS3DSH_InitTypeDef accelConfigDef;
 int main(void)
@@ -119,45 +58,6 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   init_motors();
 
-//  /* Infinite loop */
-//  /* USER CODE BEGIN WHILE */
-//
-//  float p_gain = .6;
-//  float i_gain = .5;
-//  float x_goal = 0;
-//  float y_goal = 0;
-//  float x1_error//  set_motor_x(max_thrust);
-  //  set_motor_inv_x(max_thrust);
-  //  set_motor_y(max_thrust);
-  //  set_motor_inv_y(max_thrust);
-  //  HAL_Delay(10000);//  set_motor_x(max_thrust);
-  //  set_motor_inv_x(max_thrust);
-  //  set_motor_y(max_thrust);
-  //  set_motor_inv_y(max_thrust);
-  //  HAL_Delay(10000);;
-//  float x2_error;
-//  float y1_error;
-//  float y2_error;
-//
-//  float px1 = 0;
-//  float px2 = 0;
-//  float py1 = 0;
-//  float py2 = 0;
-//  float x1int = 0;
-//  float x2int = 0;
-//  float y1int = 0;
-//  float y2int = 0;
-//  float ix1 = 0;
-//  float ix2 = 0;
-//  float iy1 = 0;
-//  float iy2 = 0;
-//  const int NUM_AVG = 5;
-//  float dy1_errors_new[5] = {0};
-//  float dy1_errors_old[5] = {0};
-//  float dy1_new_avg;
-//  float dy1_old_avg;
-
-//  float throttle = 0;
   int count = 0;
 
   while (1) {
@@ -170,80 +70,15 @@ int main(void)
         calculate_derivative();
         count = 0;
       }
-      set_motors();
-//
-//      //d calculations
-//      if(count % 10 == 0){
-//        shift(dy1_errors_old, NUM_AVG);
-//        dy1_errors_old[0] = shift(dy1_errors_new, NUM_AVG);
-//        dy1_errors_new[0] = y1_error;
-//        dy1_new_avg = average(dy1_errors_new, NUM_AVG);
-//        dy1_old_avg = average(dy1_errors_old, NUM_AVG);
-//        count = 0;
-//      }
-//
-//      px1 = map(x1_error, min_accel, max_accel, min_thrust, max_thrust);
-//      px2 = map(x2_error, min_accel, max_accel, min_thrust, max_thrust);
-//      py1 = map(y1_error, min_accel, max_accel, min_thrust, max_thrust);
-//      py2 = map(y2_error, min_accel, max_accel, min_thrust, max_thrust);
-//
-//      x1int = trim(x1int + (x1_error / 2000), 0, max_thrust - min_thrust);
-//      x2int = trim(x2int + (x2_error / 2000), 0, max_thrust - min_thrust);
-//      y1int = trim(y1int + (y1_error / 2000), 0, max_thrust - min_thrust);
-//      y2int = trim(y2int + (y2_error / 2000), 0, max_thrust - min_thrust);
-//
-//      ix1 = x1int;
-//      ix2 = x2int;
-//      iy1 = y1int;
-//      iy2 = y2int;
-//
+      set_motors(&htim4);
+
       txData[0] = controller.xp;
       txData[1] = controller.xi;
       txData[2] = controller.xd;
-////      txData[3] = trim(py2 + iy2, min_thrust, max_thrust);
-//
+
       HAL_UART_Transmit(&huart2, (uint8_t *) txData, sizeof txData, 10);
-////      HAL_Delay(250);
-//
-//
-//
-//      if(throttle < (max_thrust - min_thrust) / 6){
-//        throttle += .01;
-//      }
     }
   }
-  /* USER CODE END 3 */
-}
-
-void calculate_proportion(void){
-  controller.xp = trim(-errorData.x * params.pGain, -1000 - params.xGoal, 1000 - params.xGoal);
-  controller.yp = trim(-errorData.y * params.pGain, -1000 - params.yGoal, 1000 - params.yGoal);
-}
-
-void calculate_integral(void){
-  integralData.x = trim(integralData.x - (errorData.x * params.iGain), -1000, 1000);
-  integralData.y = trim(integralData.y - (errorData.y * params.iGain), -1000, 1000);
-  controller.xi = integralData.x;
-  controller.yi = integralData.y;
-}
-
-void calculate_derivative(void){
-  controller.xd = trim(-(errorData.x - derivativeData.x) * params.dGain, -1000, 1000);
-  controller.yd = trim(-(errorData.y - derivativeData.y) * params.dGain, -1000, 1000);
-  derivativeData.x = errorData.x;
-  derivativeData.y = errorData.y;
-}
-
-void set_motors(void){
-  set_motor_y(map(controller.xp + controller.xi + controller.xd, -3000 - params.xGoal, 3000 - params.xGoal, min_thrust, max_thrust));
-  set_motor_y(map(-controller.xp - controller.xi - controller.xd, -3000 - params.xGoal, 3000 - params.xGoal, min_thrust, max_thrust));
-  set_motor_y(map(controller.yp + controller.yi + controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, min_thrust, max_thrust));
-  set_motor_y(map(-controller.yp - controller.yi - controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, min_thrust, max_thrust));
-}
-
-void set_accel_data(LIS3DSH_DataScaled accelData){
-  errorData.x = trim(accelData.x - params.xGoal, -1000 - params.xGoal, 1000 - params.xGoal);
-  errorData.y = trim(accelData.y - params.yGoal, -1000 - params.yGoal, 1000 - params.yGoal);
 }
 
 float shift(float* arr, int arrLen){
@@ -338,15 +173,6 @@ void SystemClock_Config(void)
   */
 static void MX_SPI1_Init(void)
 {
-
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
@@ -363,10 +189,6 @@ static void MX_SPI1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
 }
 
 /**
@@ -376,18 +198,10 @@ static void MX_SPI1_Init(void)
   */
 static void MX_TIM4_Init(void)
 {
-
-  /* USER CODE BEGIN TIM4_Init 0 */
-
-  /* USER CODE END TIM4_Init 0 */
-
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
-  /* USER CODE BEGIN TIM4_Init 1 */
-
-  /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 67;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -433,9 +247,6 @@ static void MX_TIM4_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN TIM4_Init 2 */
-
-  /* USER CODE END TIM4_Init 2 */
   HAL_TIM_MspPostInit(&htim4);
 
 }
@@ -476,9 +287,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PIN_RESET;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-//  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-//  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
 }
 
 void calibrate_accel(void)
@@ -515,15 +323,17 @@ void calibrate_accel(void)
 
 void init_motors(void)
 {
-//  set_motor_x(max_thrust);
-//  set_motor_inv_x(max_thrust);
-//  set_motor_y(max_thrust);
-//  set_motor_inv_y(max_thrust);
-//  HAL_Delay(10000);
-  set_motor_x(min_thrust);
-  set_motor_inv_x(min_thrust);
-  set_motor_y(min_thrust);
-  set_motor_inv_y(min_thrust);
+  if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET){
+    set_motor_x(&htim4, max_thrust);
+    set_motor_inv_x(&htim4, max_thrust);
+    set_motor_y(&htim4, max_thrust);
+    set_motor_inv_y(&htim4, max_thrust);
+    HAL_Delay(10000);
+  }
+  set_motor_x(&htim4, min_thrust);
+  set_motor_inv_x(&htim4, min_thrust);
+  set_motor_y(&htim4, min_thrust);
+  set_motor_inv_y(&htim4, min_thrust);
   while(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET){
     HAL_Delay(50);
   }
@@ -545,26 +355,6 @@ void UART_Config(void){
     Error_Handler();
   }
 }
-
-void set_motor_x(uint32_t val){
-  htim4.Instance->CCR2 = val;
-}
-
-void set_motor_inv_x(uint32_t val){
-  htim4.Instance->CCR1 = val;
-}
-
-void set_motor_y(uint32_t val){
-  htim4.Instance->CCR4 = val;
-}
-
-void set_motor_inv_y(uint32_t val){
-  htim4.Instance->CCR3 = val;
-}
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 /**
   * @brief  This function is executed in case of error occurrence.

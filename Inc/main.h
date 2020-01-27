@@ -38,27 +38,6 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
-struct {
-  int16_t xGoal;
-  int16_t yGoal;
-  float pGain;
-  float iGain;
-  float dGain;
-} params;
-
-struct {
-  int16_t x;
-  int16_t y;
-} errorData, integralData, derivativeData;
-
-struct {
-  int16_t xp;
-  int16_t xi;
-  int16_t xd;
-  int16_t yp;
-  int16_t yi;
-  int16_t yd;
-} controller;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
