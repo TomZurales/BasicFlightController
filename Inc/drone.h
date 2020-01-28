@@ -12,13 +12,25 @@
 #include "MY_LIS3DSH.h"
 #include "stm32f4xx_hal_tim.h"
 
+// Pitch axis index
 #define PITCH 0
+
+// Roll axis index
 #define ROLL 1
+
+// Throttle value for 1ms pulse
 #define MIN_THROTTLE 183
+
+// Throttle value for 2ms pulse
 #define MAX_THROTTLE 366
+
+// Minimum value from accelerometer
 #define MIN_ACCEL -1000
+
+// Maximum value from accelerometer
 #define MAX_ACCEL 1000
 
+// PID parameters
 struct {
   int16_t xGoal;
   int16_t yGoal;
@@ -27,11 +39,25 @@ struct {
   float dGain;
 } params;
 
+// axis offsets between goal and accelerometer value
 struct {
   int16_t x;
   int16_t y;
-} errorData, integralData, derivativeData;
+} errorData;
 
+// Sum of axis error values
+struct {
+  int16_t x;
+  int16_t y;
+} integralData;
+
+// Change in axis error values
+struct {
+  int16_t x;
+  int16_t y;
+} derivativeData;
+
+// Calculated PID values for each axis
 struct {
   int16_t xp;
   int16_t xi;

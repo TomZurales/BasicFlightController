@@ -63,10 +63,7 @@ void Error_Handler(void);
 #define ACCEL_CS_Pin GPIO_PIN_3
 #define ACCEL_CS_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
-#define MOTOR_X 0x34
-#define MOTOR_INV_X 0x38
-#define MOTOR_Y 0x42
-#define MOTOR_INV_Y 0x46
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
