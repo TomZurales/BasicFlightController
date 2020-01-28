@@ -12,20 +12,12 @@
 #include "MY_LIS3DSH.h"
 #include "stm32f4xx_hal_tim.h"
 
-void set_motor_x(TIM_HandleTypeDef * timer, uint32_t);
-void set_motor_inv_x(TIM_HandleTypeDef * timer, uint32_t);
-void set_motor_y(TIM_HandleTypeDef * timer, uint32_t);
-void set_motor_inv_y(TIM_HandleTypeDef * timer, uint32_t);
-void set_accel_data(LIS3DSH_DataScaled);
-void calculate_proportion(void);
-void calculate_integral(void);
-void calculate_derivative(void);
-void set_motors(TIM_HandleTypeDef * timer);
-
-static const int16_t min_thrust = 183; //180
-static const int16_t max_thrust = 366; //370
-static const int16_t min_accel = -1000;
-static const int16_t max_accel = 1000;
+#define PITCH 0
+#define ROLL 1
+#define MIN_THROTTLE 183
+#define MAX_THROTTLE 366
+#define MIN_ACCEL -1000
+#define MAX_ACCEL 1000
 
 struct {
   int16_t xGoal;
@@ -48,5 +40,11 @@ struct {
   int16_t yi;
   int16_t yd;
 } controller;
+
+void set_accel_data(LIS3DSH_DataScaled);
+void calculate_proportion(void);
+void calculate_integral(void);
+void calculate_derivative(void);
+void set_motors(TIM_HandleTypeDef * timer);
 
 #endif /* DRONE_H_ */

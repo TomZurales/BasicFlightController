@@ -324,16 +324,16 @@ void calibrate_accel(void)
 void init_motors(void)
 {
   if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET){
-    set_motor_x(&htim4, max_thrust);
-    set_motor_inv_x(&htim4, max_thrust);
-    set_motor_y(&htim4, max_thrust);
-    set_motor_inv_y(&htim4, max_thrust);
+    htim4.Instance->CCR2 = MAX_THROTTLE;
+    htim4.Instance->CCR2 = MAX_THROTTLE;
+    htim4.Instance->CCR2 = MAX_THROTTLE;
+    htim4.Instance->CCR2 = MAX_THROTTLE;
     HAL_Delay(10000);
   }
-  set_motor_x(&htim4, min_thrust);
-  set_motor_inv_x(&htim4, min_thrust);
-  set_motor_y(&htim4, min_thrust);
-  set_motor_inv_y(&htim4, min_thrust);
+  htim4.Instance->CCR2 = MIN_THROTTLE;
+  htim4.Instance->CCR2 = MIN_THROTTLE;
+  htim4.Instance->CCR2 = MIN_THROTTLE;
+  htim4.Instance->CCR2 = MIN_THROTTLE;
   while(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET){
     HAL_Delay(50);
   }
@@ -386,3 +386,4 @@ void assert_failed(uint8_t *file, uint32_t line)
 #endif /* USE_FULL_ASSERT */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
