@@ -41,6 +41,8 @@ void config_control_params(void);
 int16_t txData[4];
 
 LIS3DSH_InitTypeDef accelConfigDef;
+DroneInitStruct droneInitStruct;
+
 int main(void)
 {
   SystemClock_Config();
@@ -58,25 +60,20 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   init_motors();
 
-  int count = 0;
 
   while (1) {
-    count += 1;
     if (LIS3DSH_PollDRDY(1000) == true) {
-      set_accel_data(LIS3DSH_GetDataScaled());
-      calculate_proportion();
-      calculate_integral();
-      if(count % 15 == 0){
-        calculate_derivative();
-        count = 0;
-      }
+      calculate_PID(LIS3DSH_GetDataScaled());
+//      calculate_proportion();
+//      calculate_integral();
+//        calculate_derivative();
       set_motors(&htim4);
 
-      txData[0] = controller.xp;
-      txData[1] = controller.xi;
-      txData[2] = controller.xd;
-
-      HAL_UART_Transmit(&huart2, (uint8_t *) txData, sizeof txData, 10);
+//      txData[0] = controller.xp;
+//      txData[1] = controller.xi;
+//      txData[2] = controller.xd;
+//
+//      HAL_UART_Transmit(&huart2, (uint8_t *) txData, sizeof txData, 10);
     }
   }
 }
@@ -106,17 +103,11 @@ void config_accel(void){
 }
 
 void config_control_params(void){
-  params.xGoal = 0;
-  params.yGoal = 0;
-  params.pGain = 2;
-  params.iGain = .02;
-  params.dGain = 7;
+  droneInitStruct.p_gain = 1;
+  droneInitStruct.i_gain = 1;
+  droneInitStruct.d_gain = 1;
 
-  integralData.x = 0;
-  integralData.y = 0;
-  derivativeData.x = 0;
-  derivativeData.y = 0;
-
+  drone_init(&droneInitStruct);
 }
 
 /**
@@ -324,16 +315,16 @@ void calibrate_accel(void)
 void init_motors(void)
 {
   if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET){
+    htim4.Instance->CCR1 = MAX_THROTTLE;
     htim4.Instance->CCR2 = MAX_THROTTLE;
-    htim4.Instance->CCR2 = MAX_THROTTLE;
-    htim4.Instance->CCR2 = MAX_THROTTLE;
-    htim4.Instance->CCR2 = MAX_THROTTLE;
+    htim4.Instance->CCR3 = MAX_THROTTLE;
+    htim4.Instance->CCR4 = MAX_THROTTLE;
     HAL_Delay(10000);
   }
+  htim4.Instance->CCR1 = MIN_THROTTLE;
   htim4.Instance->CCR2 = MIN_THROTTLE;
-  htim4.Instance->CCR2 = MIN_THROTTLE;
-  htim4.Instance->CCR2 = MIN_THROTTLE;
-  htim4.Instance->CCR2 = MIN_THROTTLE;
+  htim4.Instance->CCR3 = MIN_THROTTLE;
+  htim4.Instance->CCR4 = MIN_THROTTLE;
   while(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET){
     HAL_Delay(50);
   }
