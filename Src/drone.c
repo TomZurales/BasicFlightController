@@ -32,10 +32,20 @@ void calculate_PID(LIS3DSH_DataScaled accelData){
 }
 
 void set_motors(TIM_HandleTypeDef * timer){
-  int16_t motor_set = trim((-err.ROLL * control_gains.P) + (-err_sum.ROLL * control_gains.I) + (err_change.ROLL * control_gains.D), 0, 3 * MAX_ACCEL);
-  timer->Instance->CCR1 = map(motor_set, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
-//  timer->Instance->CCR1 = map(-controller.xp - controller.xi - controller.xd, -3000 - params.xGoal, 3000 - params.xGoal, MIN_THROTTLE, MAX_THROTTLE);
-//  timer->Instance->CCR4 = map(controller.yp + controller.yi + controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, MIN_THROTTLE, MAX_THROTTLE);
-//  timer->Instance->CCR3 = map(-controller.yp - controller.yi - controller.yd, -3000 - params.yGoal, 3000 - params.yGoal, MIN_THROTTLE, MAX_THROTTLE);
+
+//    A
+//    |
+//  B---C
+//    |
+//    D
+
+  int16_t a_setpoint = trim((-err.ROLL * control_gains.P) + (-err_sum.ROLL * control_gains.I) + (-err_change.ROLL * control_gains.D), 0, 3 * MAX_ACCEL);
+  timer->Instance->CCR3 = map(a_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
+  int16_t b_setpoint = trim((err.ROLL * control_gains.P) + (err_sum.ROLL * control_gains.I) + (err_change.ROLL * control_gains.D), 0, 3 * MAX_ACCEL);
+  timer->Instance->CCR2 = map(b_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
+  int16_t c_setpoint = trim((-err.ROLL * control_gains.P) + (-err_sum.ROLL * control_gains.I) + (-err_change.ROLL * control_gains.D), 0, 3 * MAX_ACCEL);
+  timer->Instance->CCR1 = map(c_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
+  int16_t d_setpoint = trim((-err.ROLL * control_gains.P) + (-err_sum.ROLL * control_gains.I) + (-err_change.ROLL * control_gains.D), 0, 3 * MAX_ACCEL);
+  timer->Instance->CCR4 = map(d_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
 }
 
