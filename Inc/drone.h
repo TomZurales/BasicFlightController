@@ -25,20 +25,20 @@
 #define MAX_ACCEL 1000
 
 typedef struct {
-  uint8_t p_gain;
-  uint8_t i_gain;
-  uint8_t d_gain;
+  float p_gain;
+  float i_gain;
+  float d_gain;
 } DroneInitStruct;
 
 struct Axes {
-  int16_t ROLL;
-  int16_t PITCH;
+  float ROLL;
+  float PITCH;
 };
 
 struct {
-  uint8_t P;
-  uint8_t I;
-  uint8_t D;
+  float P;
+  float I;
+  float D;
 } control_gains;
 
 // Goal parameters

@@ -103,9 +103,9 @@ void config_accel(void){
 }
 
 void config_control_params(void){
-  droneInitStruct.p_gain = 0;
-  droneInitStruct.i_gain = 0;
-  droneInitStruct.d_gain = 60;
+  droneInitStruct.p_gain = 1;
+  droneInitStruct.i_gain = .01;
+  droneInitStruct.d_gain = 7;
 
   drone_init(&droneInitStruct);
 }

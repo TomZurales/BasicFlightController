@@ -10,8 +10,8 @@
 
 #include "stdint.h"
 
-int16_t trim(int16_t in, int16_t min, int16_t max);
+float trim(float in, float min, float max);
 
-int16_t map(int16_t in, int16_t from_min, int16_t from_max, int16_t to_min, int16_t to_max);
+float map(float in, float from_min, float from_max, float to_min, float to_max);
 
 #endif /* UTILS_H_ */
