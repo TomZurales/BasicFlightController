@@ -42,6 +42,7 @@ int16_t txData[4];
 
 LIS3DSH_InitTypeDef accelConfigDef;
 DroneInitStruct droneInitStruct;
+DroneInputStruct droneInputStruct;
 
 int main(void)
 {
@@ -60,15 +61,20 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   init_motors();
 
+  droneInputStruct.roll_goal = 0;
+  droneInputStruct.pitch_goal = 0;
+  droneInputStruct.throttle = 0;
 
   while (1) {
     if (LIS3DSH_PollDRDY(1000) == true) {
       calculate_PID(LIS3DSH_GetDataScaled());
-//      calculate_proportion();
-//      calculate_integral();
-//        calculate_derivative();
+      set_input(&droneInputStruct);
       set_motors(&htim4);
 
+      // Slowly ramp up throttle
+      if(droneInputStruct.throttle < 3000){
+        droneInputStruct.throttle += .1;
+      }
 //      txData[0] = controller.xp;
 //      txData[1] = controller.xi;
 //      txData[2] = controller.xd;

@@ -24,8 +24,8 @@ void calculate_PID(LIS3DSH_DataScaled accelData){
   err.pitch = trim(goal.pitch - sensor.pitch, MIN_ACCEL, MAX_ACCEL);
   err.roll = trim(goal.roll - sensor.roll, MIN_ACCEL, MAX_ACCEL);
 
-  err_sum.pitch = trim(err_sum.pitch + err.pitch * control_gains.i, MIN_ACCEL, MAX_ACCEL);
-  err_sum.roll = trim(err_sum.roll + err.roll * control_gains.i, MIN_ACCEL, MAX_ACCEL);
+  err_sum.pitch = trim(err_sum.pitch + err.pitch * control_gains.i, 0, MAX_ACCEL);
+  err_sum.roll = trim(err_sum.roll + err.roll * control_gains.i, 0, MAX_ACCEL);
 
   err_change.pitch = trim(err.pitch - err_prev.pitch, MIN_ACCEL, MAX_ACCEL);
   err_change.roll = trim(err.roll - err_prev.roll, MIN_ACCEL, MAX_ACCEL);
@@ -41,14 +41,20 @@ void set_motors(TIM_HandleTypeDef * timer){
 //    |
 //    D
 
-  int16_t a_setpoint = trim((-err.pitch * control_gains.p) + (-err_sum.pitch) + (-err_change.pitch * control_gains.d), 0, 3 * MAX_ACCEL);
+  int16_t a_setpoint = trim((-err.pitch * control_gains.p) + (-err_sum.pitch) + (-err_change.pitch * control_gains.d) + goal.throttle, 0, 3 * MAX_ACCEL);
   timer->Instance->CCR3 = map(a_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
-  int16_t b_setpoint = trim((err.roll * control_gains.p) + (err_sum.roll) + (err_change.roll * control_gains.d), 0, 3 * MAX_ACCEL);
+  int16_t b_setpoint = trim((err.roll * control_gains.p) + (err_sum.roll) + (err_change.roll * control_gains.d) + goal.throttle, 0, 3 * MAX_ACCEL);
   timer->Instance->CCR2 = map(b_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
-  int16_t c_setpoint = trim((-err.roll * control_gains.p) + (-err_sum.roll) + (-err_change.roll * control_gains.d), 0, 3 * MAX_ACCEL);
+  int16_t c_setpoint = trim((-err.roll * control_gains.p) + (-err_sum.roll) + (-err_change.roll * control_gains.d) + goal.throttle, 0, 3 * MAX_ACCEL);
   timer->Instance->CCR1 = map(c_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
-  int16_t d_setpoint = trim((err.pitch * control_gains.p) + (err_sum.pitch) + (err_change.pitch * control_gains.d), 0, 3 * MAX_ACCEL);
+  int16_t d_setpoint = trim((err.pitch * control_gains.p) + (err_sum.pitch) + (err_change.pitch * control_gains.d) + goal.throttle, 0, 3 * MAX_ACCEL);
   timer->Instance->CCR4 = map(d_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
+}
+
+void set_input(DroneInputStruct* input){
+  goal.roll = input-> roll_goal;
+  goal.pitch = input->pitch_goal;
+  goal.throttle = input->throttle;
 }
 
 float get_filtered_value(uint8_t axis, float new_value){

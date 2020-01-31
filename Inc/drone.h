@@ -40,6 +40,12 @@ typedef struct {
   uint8_t filter_mode;
 } DroneInitStruct;
 
+typedef struct {
+  float roll_goal;
+  float pitch_goal;
+  float throttle;
+} DroneInputStruct;
+
 struct Axes {
   float roll;
   float pitch;
@@ -61,7 +67,11 @@ struct {
 } filter;
 
 // Goal parameters
-struct Axes goal;
+struct{
+  float roll;
+  float pitch;
+  float throttle;
+} goal;
 
 // Accelerometer offsets
 struct Axes sensor;
@@ -81,6 +91,8 @@ struct Axes err_prev;
 void drone_init(DroneInitStruct*);
 
 void calculate_PID(LIS3DSH_DataScaled);
+
+void set_input(DroneInputStruct*);
 
 void set_motors(TIM_HandleTypeDef * timer);
 
