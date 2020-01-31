@@ -24,22 +24,41 @@
 // Maximum value from accelerometer
 #define MAX_ACCEL 1000
 
+// Axes Indexes
+#define ROLL 0
+#define PITCH 1
+
+// Filter constants
+#define FILTER_SIZE 10
+#define FILTER_MODE_NONE 0
+#define FILTER_MODE_AVERAGE 1
+
 typedef struct {
   float p_gain;
   float i_gain;
   float d_gain;
+  uint8_t filter_mode;
 } DroneInitStruct;
 
 struct Axes {
-  float ROLL;
-  float PITCH;
+  float roll;
+  float pitch;
 };
 
 struct {
-  float P;
-  float I;
-  float D;
+  float p;
+  float i;
+  float d;
 } control_gains;
+
+struct {
+  uint8_t filter_mode;
+} control_params;
+
+struct {
+  float roll[FILTER_SIZE];
+  float pitch[FILTER_SIZE];
+} filter;
 
 // Goal parameters
 struct Axes goal;
@@ -60,7 +79,11 @@ struct Axes err_change;
 struct Axes err_prev;
 
 void drone_init(DroneInitStruct*);
+
 void calculate_PID(LIS3DSH_DataScaled);
+
 void set_motors(TIM_HandleTypeDef * timer);
+
+float get_filtered_value(uint8_t axis, float new_value);
 
 #endif /* DRONE_H_ */

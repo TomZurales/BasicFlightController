@@ -78,22 +78,6 @@ int main(void)
   }
 }
 
-float shift(float* arr, int arrLen){
-    float ret = arr[arrLen - 1];
-    for(int i = arrLen - 2; i >= 0; i--){
-        arr[i + 1] = arr[i];
-    }
-    return ret;
-}
-
-float average(float* arr, int arrLen){
-    float sum = 0;
-    for(int i = 0; i < arrLen; i++){
-        sum += arr[i];
-    }
-    return sum / arrLen;
-}
-
 void config_accel(void){
   accelConfigDef.dataRate = LIS3DSH_DATARATE_400;
   accelConfigDef.fullScale = LIS3DSH_FULLSCALE_4;
@@ -106,6 +90,8 @@ void config_control_params(void){
   droneInitStruct.p_gain = 1;
   droneInitStruct.i_gain = .01;
   droneInitStruct.d_gain = 7;
+
+  droneInitStruct.filter_mode = FILTER_MODE_AVERAGE;
 
   drone_init(&droneInitStruct);
 }

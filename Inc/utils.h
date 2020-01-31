@@ -14,4 +14,8 @@ float trim(float in, float min, float max);
 
 float map(float in, float from_min, float from_max, float to_min, float to_max);
 
+float shift(float* arr, int arrLen);
+
+float average(float* arr, uint8_t arrLen);
+
 #endif /* UTILS_H_ */
