@@ -23,7 +23,7 @@
 
 LIS3DSH_DataScaled accelData;
 UART_HandleTypeDef huart2;
-int EXTI0_FLAG = 0;
+uint accel_flag = 0;
 
 SPI_HandleTypeDef hspi1;
 
@@ -37,6 +37,7 @@ static void MX_SPI1_Init(void);
 static void MX_TIM4_Init(void);
 void config_accel(void);
 void config_control_params(void);
+void HAL_GPIO_EXTI_Callback(uint16_t);
 
 int16_t txData[4];
 
@@ -66,22 +67,29 @@ int main(void)
   droneInputStruct.throttle = 0;
 
   while (1) {
-    if (LIS3DSH_PollDRDY(1000) == true) {
+    if (accel_flag == 1) {
+      accel_flag = 0;
       calculate_PID(LIS3DSH_GetDataScaled());
       set_input(&droneInputStruct);
       set_motors(&htim4);
 
-      // Slowly ramp up throttle
-      if(droneInputStruct.throttle < 3000){
-        droneInputStruct.throttle += .1;
-      }
 //      txData[0] = controller.xp;
 //      txData[1] = controller.xi;
 //      txData[2] = controller.xd;
 //
 //      HAL_UART_Transmit(&huart2, (uint8_t *) txData, sizeof txData, 10);
     }
+
+    // Slowly ramp up throttle
+    if(droneInputStruct.throttle < 3000){
+      droneInputStruct.throttle += .1;
+    }
   }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  accel_flag = 1;
 }
 
 void config_accel(void){
@@ -89,7 +97,7 @@ void config_accel(void){
   accelConfigDef.fullScale = LIS3DSH_FULLSCALE_4;
   accelConfigDef.antiAliasingBW = LIS3DSH_FILTER_BW_50;
   accelConfigDef.enableAxes = LIS3DSH_XYZ_ENABLE;
-  accelConfigDef.interruptEnable = false;
+  accelConfigDef.interruptEnable = true;
 }
 
 void config_control_params(void){
