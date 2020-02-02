@@ -37,7 +37,7 @@ static void MX_SPI1_Init(void);
 static void MX_TIM4_Init(void);
 void config_accel(void);
 void config_control_params(void);
-void HAL_GPIO_EXTI_Callback(uint16_t);
+void EXTI0_IRQHandler(void);
 
 int16_t txData[4];
 
@@ -82,14 +82,18 @@ int main(void)
 
     // Slowly ramp up throttle
     if(droneInputStruct.throttle < 3000){
-      droneInputStruct.throttle += .1;
+      droneInputStruct.throttle += .01;
     }
+
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
   }
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void EXTI0_IRQHandler(void)
 {
+  HAL_NVIC_DisableIRQ(EXTI0_IRQn);
   accel_flag = 1;
+  return;
 }
 
 void config_accel(void){
@@ -103,7 +107,7 @@ void config_accel(void){
 void config_control_params(void){
   droneInitStruct.p_gain = 1;
   droneInitStruct.i_gain = .01;
-  droneInitStruct.d_gain = 7;
+  droneInitStruct.d_gain = 15;
 
   droneInitStruct.filter_mode = FILTER_MODE_AVERAGE;
 
@@ -278,6 +282,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PIN_RESET;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 }
 
 void calibrate_accel(void)
