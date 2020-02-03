@@ -40,7 +40,7 @@ void config_control_params(void);
 void EXTI0_IRQHandler(void);
 
 int16_t txData[4];
-
+int16_t throttle = 0;
 LIS3DSH_InitTypeDef accelConfigDef;
 DroneInitStruct droneInitStruct;
 DroneInputStruct droneInputStruct;
@@ -62,15 +62,13 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   init_motors();
 
-  droneInputStruct.roll_goal = 0;
-  droneInputStruct.pitch_goal = 0;
-  droneInputStruct.throttle = 0;
+  set_input(0, 0, 0);
 
   while (1) {
     if (accel_flag == 1) {
       accel_flag = 0;
       calculate_PID(LIS3DSH_GetDataScaled());
-      set_input(&droneInputStruct);
+      set_input(0, 0, throttle);
       set_motors(&htim4);
 
 //      txData[0] = controller.xp;
@@ -81,8 +79,8 @@ int main(void)
     }
 
     // Slowly ramp up throttle
-    if(droneInputStruct.throttle < 3000){
-      droneInputStruct.throttle += .01;
+    if(throttle < 3000){
+      throttle += .01;
     }
 
     HAL_NVIC_EnableIRQ(EXTI0_IRQn);

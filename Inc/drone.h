@@ -92,7 +92,7 @@ void drone_init(DroneInitStruct*);
 
 void calculate_PID(LIS3DSH_DataScaled);
 
-void set_input(DroneInputStruct*);
+void set_input(int16_t pitch_goal, int16_t roll_goal, uint16_t throttle);
 
 void set_motors(TIM_HandleTypeDef * timer);
 

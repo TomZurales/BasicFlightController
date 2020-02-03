@@ -51,10 +51,10 @@ void set_motors(TIM_HandleTypeDef * timer){
   timer->Instance->CCR4 = map(d_setpoint, 0, 3 * MAX_ACCEL, MIN_THROTTLE, MAX_THROTTLE);
 }
 
-void set_input(DroneInputStruct* input){
-  goal.roll = input-> roll_goal;
-  goal.pitch = input->pitch_goal;
-  goal.throttle = input->throttle;
+void set_input(int16_t pitch_goal, int16_t roll_goal, uint16_t throttle){
+  goal.roll = roll_goal;
+  goal.pitch = pitch_goal;
+  goal.throttle = throttle;
 }
 
 float get_filtered_value(uint8_t axis, float new_value){
