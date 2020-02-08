@@ -107,7 +107,7 @@ void config_control_params(void){
   droneInitStruct.i_gain = .01;
   droneInitStruct.d_gain = 15;
 
-  droneInitStruct.filter_mode = FILTER_MODE_AVERAGE;
+  droneInitStruct.filter_mode = FILTER_MODE_ELIMINATE_OUTLIERS;
 
   drone_init(&droneInitStruct);
 }
