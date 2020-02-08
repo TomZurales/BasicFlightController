@@ -32,6 +32,7 @@
 #define FILTER_SIZE 10
 #define FILTER_MODE_NONE 0
 #define FILTER_MODE_AVERAGE 1
+#define FILTER_MODE_ELIMINATE_OUTLIERS 2
 
 typedef struct {
   float p_gain;

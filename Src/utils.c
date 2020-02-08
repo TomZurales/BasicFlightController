@@ -30,10 +30,29 @@ float shift(float* arr, int arrLen){
     return ret;
 }
 
-float average(float* arr, uint8_t arrLen){
+float average(float* arr, uint8_t arrLen, uint8_t numAvg){
     float sum = 0;
     for(int i = 0; i < arrLen; i++){
         sum += arr[i];
     }
-    return sum / arrLen;
+    return sum / numAvg;
+}
+
+int compare_ascending( const void* a, const void* b)
+{
+     int float_a = * ( (float*) a );
+     int float_b = * ( (float*) b );
+
+     if ( float_a == float_b ) return 0;
+     else if ( float_a < float_b ) return -1;
+     else return 1;
+}
+
+float* sort(float* arr, uint8_t arrLen){
+  float arrCopy[arrLen];
+  for(int i = 0; i < arrLen; i++){
+    arrCopy[i] = arr[i];
+  }
+  qsort(arrCopy, arrLen, sizeof(float), compare_ascending);
+  return arrCopy;
 }

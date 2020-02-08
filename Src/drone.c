@@ -66,7 +66,21 @@ float get_filtered_value(uint8_t axis, float new_value){
   if(control_params.filter_mode == FILTER_MODE_AVERAGE){
     shift(filter_axis, FILTER_SIZE);
     filter_axis[0] = new_value;
-    return average(filter_axis, FILTER_SIZE);
+    return average(filter_axis, FILTER_SIZE, FILTER_SIZE);
+  } else if(control_params.filter_mode == FILTER_MODE_ELIMINATE_OUTLIERS){
+    float* sorted = sort(filter_axis, FILTER_SIZE);
+    int quartile_size = FILTER_SIZE / 4;
+    float iqr = sorted[quartile_size * 3] - sorted[quartile_size];
+    float tlo = sorted[quartile_size] - (1.5 * iqr);
+    float thi = sorted[quartile_size * 3] + (1.5 * iqr);
+    uint8_t num_avg = FILTER_SIZE;
+    for(int i = 0; i < FILTER_SIZE; i++){
+      if(sorted[i] < tlo || sorted[i] > thi){
+        sorted[i] = 0;
+        num_avg--;
+      }
+    }
+    return average(sorted, FILTER_SIZE, num_avg);
   }
 
   // If an unrecognized filter value is read, default to no filtering
